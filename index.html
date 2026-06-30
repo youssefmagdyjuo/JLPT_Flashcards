@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JLPT Flashcards - Master Japanese</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- SheetJS (xlsx) Library -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- App Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-theme">
+  <!-- Subtle animated backdrops -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  
+  <div class="app-wrapper">
+    <!-- Main glass container matching Image 2 style -->
+    <div class="glass-container">
+      
+      <!-- Top Navigation Header -->
+      <header class="app-header">
+        <div class="logo" id="nav-logo">
+          <span class="logo-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+          <span class="logo-text">JLPT <span class="highlight">Flashcards</span></span>
+        </div>
+        <nav class="nav-links">
+          <a href="#/home" class="nav-link active" data-page="home"><i class="fa-solid fa-house"></i> Home</a>
+          <a href="#/library" class="nav-link" data-page="library"><i class="fa-solid fa-book-open"></i> Library</a>
+          <a href="#/add" class="nav-link" data-page="add"><i class="fa-solid fa-circle-plus"></i> Add Card</a>
+          <a href="#/review" class="nav-link" data-page="review"><i class="fa-solid fa-graduation-cap"></i> Review</a>
+          <a href="#/stats" class="nav-link" data-page="stats"><i class="fa-solid fa-chart-simple"></i> Stats</a>
+        </nav>
+        <div class="header-actions">
+          <button id="theme-toggle" class="icon-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Dynamic Content Container -->
+      <main id="app-content" class="page-container">
+        <!-- Content injected dynamically via modules -->
+        <div class="loader">
+          <div class="spinner"></div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Excel Import Modal -->
+  <div id="import-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-import"></i> Import Flashcards from Excel</h3>
+        <button class="close-modal-btn" id="close-import-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Drag & Drop Zone -->
+        <div id="drag-drop-zone" class="drag-drop-zone">
+          <i class="fa-solid fa-cloud-arrow-up drag-icon"></i>
+          <p class="drag-text">Drag & drop your Excel file here or <span class="browse-link">browse</span></p>
+          <p class="drag-hint">Supports .xlsx workbooks with Hiragana, Katakana, Verbs, Sentences, Kanji sheets</p>
+          <input type="file" id="excel-file-input" accept=".xlsx" class="hidden-file-input">
+        </div>
+
+        <!-- Duplication Strategy Selector -->
+        <div class="import-strategy-container hidden" id="import-strategy-selection">
+          <h4>Duplicate Detection Strategy</h4>
+          <p class="strategy-desc">Choose how to handle duplicate flashcards matching existing category and content:</p>
+          <div class="strategy-options">
+            <label class="strategy-option">
+              <input type="radio" name="duplicate-strategy" value="skip" checked>
+              <span class="option-card">
+                <i class="fa-solid fa-ban"></i>
+                <strong>Skip Duplicates</strong>
+                <span>Keep existing cards and ignore incoming matches</span>
+              </span>
+            </label>
+            <label class="strategy-option">
+              <input type="radio" name="duplicate-strategy" value="replace">
+              <span class="option-card">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <strong>Replace Existing</strong>
+                <span>Overwrite existing matches with new data</span>
+              </span>
+            </label>
+            <label class="strategy-option">
+              <input type="radio" name="duplicate-strategy" value="keep">
+              <span class="option-card">
+                <i class="fa-solid fa-copy"></i>
+                <strong>Keep Both</strong>
+                <span>Import duplicate items and assign new IDs</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="import-preview-section" class="import-preview-section hidden">
+          <div class="preview-summary-bar">
+            <span id="preview-total-count">Found: 0 records</span>
+            <span id="preview-valid-count" class="text-success">0 valid</span>
+            <span id="preview-invalid-count" class="text-danger">0 invalid</span>
+          </div>
+          <div class="table-scroll-container">
+            <table class="preview-table">
+              <thead>
+                <tr id="preview-table-header">
+                  <!-- Dynamic -->
+                </tr>
+              </thead>
+              <tbody id="preview-table-body">
+                <!-- Dynamic -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-import-btn" class="btn secondary-btn">Cancel</button>
+        <button id="confirm-import-btn" class="btn primary-btn hidden">Confirm Import</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel Import Summary Modal -->
+  <div id="summary-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-card mini-modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-square-poll-horizontal"></i> Import Results</h3>
+        <button class="close-modal-btn" id="close-summary-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="summary-status-icon text-success"><i class="fa-solid fa-circle-check"></i></div>
+        <h4 class="margin-bottom-md">Import Completed Successfully!</h4>
+        <div class="summary-stats-grid">
+          <div class="stat-box">
+            <span class="stat-num" id="sum-total">0</span>
+            <span class="stat-label">Total Rows</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num text-success" id="sum-imported">0</span>
+            <span class="stat-label">Imported</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num text-warning" id="sum-skipped">0</span>
+            <span class="stat-label">Skipped</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num text-info" id="sum-replaced">0</span>
+            <span class="stat-label">Replaced</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num text-danger" id="sum-failed">0</span>
+            <span class="stat-label">Failed</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer justify-center">
+        <button id="close-summary-ok-btn" class="btn primary-btn">Awesome</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Excel Export Options Modal -->
+  <div id="export-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-card mini-modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-export"></i> Export to Excel</h3>
+        <button class="close-modal-btn" id="close-export-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="margin-bottom-md">Select what data you would like to export to your Excel workbook:</p>
+        <div class="export-options">
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="all" checked>
+            <span>All Flashcards</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="hiragana">
+            <span>Hiragana Only</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="katakana">
+            <span>Katakana Only</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="verb">
+            <span>Verbs Only</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="sentence">
+            <span>Sentences Only</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="kanji">
+            <span>Kanji Only</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="export-scope" value="favorites">
+            <span>Favorites Starred</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-export-btn" class="btn secondary-btn">Cancel</button>
+        <button id="confirm-export-btn" class="btn primary-btn">Export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Application Entry Module -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
