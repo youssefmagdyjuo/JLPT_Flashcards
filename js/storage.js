@@ -17,6 +17,105 @@ const DEFAULT_CARDS = [
     createdAt: Date.now()
   },
   {
+    id: 'def-h2',
+    type: 'hiragana',
+    english: 'I',
+    japanese: 'い',
+    pronunciation: 'i',
+    jlpt: 'N5',
+    notes: 'Second character in Hiragana syllabary.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h3',
+    type: 'hiragana',
+    english: 'U',
+    japanese: 'う',
+    pronunciation: 'u',
+    jlpt: 'N5',
+    notes: 'Third character in Hiragana syllabary.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h4',
+    type: 'hiragana',
+    english: 'E',
+    japanese: 'え',
+    pronunciation: 'e',
+    jlpt: 'N5',
+    notes: 'Fourth character in Hiragana syllabary.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h5',
+    type: 'hiragana',
+    english: 'O',
+    japanese: 'お',
+    pronunciation: 'o',
+    jlpt: 'N5',
+    notes: 'Fifth character in Hiragana syllabary.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h6',
+    type: 'hiragana',
+    english: 'KA',
+    japanese: 'か',
+    pronunciation: 'ka',
+    jlpt: 'N5',
+    notes: 'K-row character in Hiragana.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h7',
+    type: 'hiragana',
+    english: 'KI',
+    japanese: 'き',
+    pronunciation: 'ki',
+    jlpt: 'N5',
+    notes: 'K-row character in Hiragana.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h8',
+    type: 'hiragana',
+    english: 'KU',
+    japanese: 'く',
+    pronunciation: 'ku',
+    jlpt: 'N5',
+    notes: 'K-row character in Hiragana.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h9',
+    type: 'hiragana',
+    english: 'KE',
+    japanese: 'け',
+    pronunciation: 'ke',
+    jlpt: 'N5',
+    notes: 'K-row character in Hiragana.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
+    id: 'def-h10',
+    type: 'hiragana',
+    english: 'KO',
+    japanese: 'こ',
+    pronunciation: 'ko',
+    jlpt: 'N5',
+    notes: 'K-row character in Hiragana.',
+    favorite: false,
+    createdAt: Date.now()
+  },
+  {
     id: 'def-k1',
     type: 'katakana',
     english: 'KA',
