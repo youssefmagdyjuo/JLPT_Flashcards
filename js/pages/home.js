@@ -9,7 +9,7 @@ export function renderHome(container) {
     <div class="home-grid">
       <!-- Hero Header & Quick Actions -->
       <div class="home-hero">
-        <h1 class="fade-in">Master Japanese test test<br>One Card at a Time</h1>
+        <h1 class="fade-in">Master Japanese<br>One Card at a Time</h1>
         <p class="fade-in-delayed">Build custom flashcards, practice using sleek 3D cards, and track your JLPT mastery offline.</p>
         
         <div class="home-actions-group">

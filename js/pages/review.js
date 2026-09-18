@@ -10,6 +10,7 @@ export function renderReview(container) {
   let score = 0; // count of cards user self-assessed as correct
   let answered = {}; // map of index -> boolean (true: correct, false: incorrect)
   let keyboardHandler = null;
+  let isNavigating = false;
 
   // Render review configuration form
   function renderSetup() {
@@ -163,29 +164,52 @@ export function renderReview(container) {
   }
 
   function flipCard() {
+    if (isNavigating) return;
     const studyCard = container.querySelector('#study-card');
     if (studyCard) {
       studyCard.classList.toggle('is-flipped');
     }
   }
 
-  function goPrevious() {
-    if (currentIndex > 0) {
-      currentIndex--;
-      renderActiveCard();
-    } else {
+  function goToCard(targetIndex) {
+    if (isNavigating) return;
+    if (targetIndex < 0) {
       showToast('Already at the first card', 'info');
+      return;
+    }
+    if (targetIndex >= sessionCards.length) {
+      showToast('You reached the end of the session! Click Finish to save.', 'info');
+      return;
+    }
+
+    const studyCard = container.querySelector('#study-card');
+    const isFlipped = studyCard && studyCard.classList.contains('is-flipped');
+
+    if (isFlipped) {
+      isNavigating = true;
+
+      // Rotate card back to the front face in full 3D
+      studyCard.classList.remove('is-flipped');
+
+      // Wait until flip animation finishes (600ms) before rendering new card text
+      setTimeout(() => {
+        currentIndex = targetIndex;
+        renderActiveCard();
+        isNavigating = false;
+      }, 600);
+    } else {
+      // If card was already front-facing, update directly
+      currentIndex = targetIndex;
+      renderActiveCard();
     }
   }
 
+  function goPrevious() {
+    goToCard(currentIndex - 1);
+  }
+
   function goNext() {
-    if (currentIndex < sessionCards.length - 1) {
-      currentIndex++;
-      renderActiveCard();
-    } else {
-      // Prompt completion if at last card
-      showToast('You reached the end of the session! Click Finish to save.', 'info');
-    }
+    goToCard(currentIndex + 1);
   }
 
   function renderCardStage() {
@@ -358,6 +382,7 @@ export function renderReview(container) {
       if (btn) {
         btn.addEventListener('click', (e) => {
           e.stopPropagation(); // prevent flip card trigger
+          if (isNavigating) return;
           
           const wasScored = answered[currentIndex] !== undefined;
           const wasCorrect = answered[currentIndex] === true;
@@ -399,6 +424,7 @@ export function renderReview(container) {
   }
 
   function finishSession() {
+    isNavigating = false;
     // Unbind keyboard shortcuts
     if (keyboardHandler) {
       document.removeEventListener('keydown', keyboardHandler);
